@@ -39,7 +39,6 @@ class Terminal(Static):
     
     def start_shell(self):
         if sys.platform == "win32":
-            # Start PowerShell with appropriate parameters
             self.process = subprocess.Popen(
                 ["powershell.exe", "-NoLogo"],
                 stdin=subprocess.PIPE,
@@ -49,11 +48,9 @@ class Terminal(Static):
                 creationflags=subprocess.CREATE_NO_WINDOW
             )
             
-            # Start threads to read output
             threading.Thread(target=self._read_output, args=(self.process.stdout,), daemon=True).start()
             threading.Thread(target=self._read_output, args=(self.process.stderr,), daemon=True).start()
         else:
-            # For Unix systems, use pty for better terminal emulation
             import pty
             master, slave = pty.openpty()
             self.process = subprocess.Popen(
@@ -106,14 +103,11 @@ class Terminal(Static):
     
     def render(self) -> RenderableType:
         """Render the terminal content."""
-        # Combine output buffer and current input line
-        content = "".join(self.output_buffer[-500:])  # Keep last 500 lines for performance
+        content = "".join(self.output_buffer[-500:])
         prompt_line = f"{self.input_buffer}"
         
-        # Create a Text object instead of using console.render
         terminal_content = Text(content + "\n" + prompt_line)
         
-        # Return a Panel with the terminal content
         return Panel(
             terminal_content,
             title="PowerShell" if sys.platform == "win32" else "Bash",
@@ -127,7 +121,7 @@ class Terminal(Static):
             if sys.platform == "win32":
                 self.process.send_signal(subprocess.signal.CTRL_C_EVENT)
             else:
-                self.process.send_signal(2)  # SIGINT
+                self.process.send_signal(2) 
     
     def on_key(self, event: events.Key):
         """Handle key events."""

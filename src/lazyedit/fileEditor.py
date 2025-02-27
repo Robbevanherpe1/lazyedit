@@ -3,7 +3,6 @@ from textual.reactive import reactive
 from rich.style import Style
 from textual.widgets.text_area import TextAreaTheme
 
-# Define the theme outside the class
 my_theme = TextAreaTheme(
     name="EditorTheme",
     cursor_style=Style(color="white", bgcolor="blue"),
@@ -19,11 +18,8 @@ class FileEditor(TextArea):
     editing: bool = reactive(False)
     
     def __init__(self, *args, **kwargs):
-        # First initialize with default theme
         super().__init__(*args, **kwargs)
-        # Then register our custom theme
         self.register_theme(my_theme)
-        # Now we can set the theme
         self.theme = "EditorTheme"
 
     def set_content(self, new_content, filename):
