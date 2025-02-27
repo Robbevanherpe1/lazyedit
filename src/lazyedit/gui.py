@@ -75,7 +75,7 @@ class MyApp(App):
         elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("3"):
             self.file_editor.exit_editing()
             self.active_widget = self.terminal
-        elif event.key == "ctrl+s" and self.active_widget == self.file_editor:
+        elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("s") and self.active_widget == self.file_editor:
             self.file_editor.save_file()
         elif hasattr(self.active_widget, "on_key"):
             self.active_widget.on_key(event)
