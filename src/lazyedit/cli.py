@@ -1,6 +1,6 @@
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, HorizontalScroll, Vertical
-from textual.widgets import Static, Input
+from textual.widgets import Static, Input, TextArea
 from textual.reactive import reactive
 from rich.panel import Panel
 from rich.text import Text
@@ -42,28 +42,20 @@ class Directory(Static):
             if os.path.isfile(selected_file):
                 with open(selected_file, "r", encoding="utf-8", errors="ignore") as f:
                     file_content = f.read()
-                self.app.file_editor.set_content(file_content)
+                self.app.file_editor.set_content(file_content, selected_file)
         self.render_files()
 
-class FileEditor(Static):
-    content: str = reactive("SELECT * FROM table;")
+class FileEditor(TextArea):
+    current_file: str = ""
 
-    def on_mount(self):
-        self.update_editor()
+    def set_content(self, new_content, filename):
+        self.current_file = filename
+        self.load_text(new_content)
 
-    def update_editor(self):
-        self.update(Panel(self.content, title="File Editor", border_style="yellow"))
-
-    def set_content(self, new_content):
-        self.content = new_content
-        self.update_editor()
-
-    def on_key(self, event):
-        if event.key.isprintable():
-            self.content += event.key
-        elif event.key == "backspace":
-            self.content = self.content[:-1]
-        self.update_editor()
+    def save_file(self):
+        if self.current_file:
+            with open(self.current_file, "w", encoding="utf-8") as f:
+                f.write(self.text)
 
 class Terminal(Static):
     terminal_output: str = reactive("")
@@ -110,7 +102,7 @@ class Terminal(Static):
 
 class CommandFooter(Static):
     def on_mount(self):
-        self.update("Commands: (q) Quit     (s) Save File    (Ctrl+1) Directory    (Ctrl+2) File Editor    (Ctrl+3) Terminal")
+        self.update("Commands: (q) Quit     (Ctrl+S) Save File    (Ctrl+1) Directory    (Ctrl+2) File Editor    (Ctrl+3) Terminal")
 
 class MyApp(App):
     CSS = """
@@ -166,6 +158,8 @@ class MyApp(App):
             self.active_widget = self.file_editor
         elif event.key == "ctrl+3":
             self.active_widget = self.terminal
+        elif event.key == "ctrl+s" and self.active_widget == self.file_editor:
+            self.file_editor.save_file()
         elif hasattr(self.active_widget, "on_key"):
             self.active_widget.on_key(event)
 
