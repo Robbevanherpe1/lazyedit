@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lazyedit"
+dynamic = ["version"]
+description = 'A textual-based lazy editing tool'
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE.txt" }
+keywords = []
+authors = [
+  { name = "Robbe", email = "robbe.van.herpe@outlook.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "textual==0.47.1"
+]
+
+[project.urls]
+Documentation = "https://github.com/Robbe/lazyedit#readme"
+Issues = "https://github.com/Robbe/lazyedit/issues"
+Source = "https://github.com/Robbe/lazyedit"
+
+[project.scripts]
+lazyedit = "lazyedit.cli:run"
+
+[tool.hatch.version]
+path = "src/lazyedit/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/lazyedit tests}"
+
+[tool.coverage.run]
+source_pkgs = ["lazyedit", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/lazyedit/__about__.py",
+]
+
+[tool.coverage.paths]
+lazyedit = ["src/lazyedit", "*/lazyedit/src/lazyedit"]
+tests = ["tests", "*/lazyedit/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
