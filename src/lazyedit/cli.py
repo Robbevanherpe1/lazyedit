@@ -19,7 +19,10 @@ class Directory(Static):
 
     def update_directory(self):
         files = "\n".join(os.listdir("."))
-        self.update(Panel(files, title="Directory", border_style="yellow"))
+        self.update(Panel(files, title="1 Directory", border_style="yellow"))
+
+    def on_key(self, event):
+        pass
 
 class FileEditor(Static):
     content: str = reactive("SELECT * FROM table;")
@@ -28,7 +31,7 @@ class FileEditor(Static):
         self.update_editor()
 
     def update_editor(self):
-        self.update(Panel(self.content, title="File Editor", border_style="yellow"))
+        self.update(Panel(self.content, title="2 File Editor", border_style="yellow"))
 
     def on_key(self, event):
         if event.key.isprintable():
@@ -47,7 +50,7 @@ class Terminal(Static):
 
     def update_terminal(self, output: str):
         self.terminal_output += output
-        self.update(Panel(self.terminal_output, title="Terminal", border_style="yellow"))
+        self.update(Panel(self.terminal_output, title="3 Terminal", border_style="yellow"))
 
     def start_shell(self):
         if sys.platform == "win32":
@@ -82,7 +85,7 @@ class Terminal(Static):
 
 class CommandFooter(Static):
     def on_mount(self):
-        self.update("Commands: (q) Quit     (s) Save File")
+        self.update("Commands: (q) Quit     (s) Save File    (Ctrl+1) Directory    (Ctrl+2) File Editor    (Ctrl+3) Terminal")
 
 class MyApp(App):
     CSS = """
@@ -109,18 +112,37 @@ class MyApp(App):
     }
     """
 
+    def __init__(self):
+        super().__init__()
+        self.active_widget = None
+
     def compose(self) -> ComposeResult:
+        self.directory = Directory()
+        self.file_editor = FileEditor()
+        self.terminal = Terminal()
+        self.footer = CommandFooter()
+
         with Horizontal():
-            yield Directory()
+            yield self.directory
             with Vertical():
                 with HorizontalScroll():
-                    yield FileEditor()
-                yield Terminal()
-        yield CommandFooter()
+                    yield self.file_editor
+                yield self.terminal
+        yield self.footer
+
+        self.active_widget = self.directory
 
     def on_key(self, event):
         if event.key.lower() == "q":
             self.exit()
+        elif event.key == "ctrl+1":
+            self.active_widget = self.directory
+        elif event.key == "ctrl+2":
+            self.active_widget = self.file_editor
+        elif event.key == "ctrl+3":
+            self.active_widget = self.terminal
+        elif hasattr(self.active_widget, "on_key"):
+            self.active_widget.on_key(event)
 
 def run():
     MyApp().run()
