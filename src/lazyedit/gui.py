@@ -70,11 +70,6 @@ class MyApp(App):
             self.exit()
 
         elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("2"):
-            if self.active_widget == self.file_editor and hasattr(self.file_editor, "cursor_position"):
-                cursor_pos = self.file_editor.cursor_position
-                if isinstance(cursor_pos, tuple) and len(cursor_pos) == 2:
-                    self.cursor_row = cursor_pos[0]
-                    self.cursor_column = cursor_pos[1]
             
             self.file_editor.exit_editing()
             self.file_editor.editing = False
@@ -85,17 +80,8 @@ class MyApp(App):
             self.directory.browsing = False
             self.active_widget = self.file_editor
             self.file_editor.editing = True
-        
-            if self.file_editor.document.line_count > 0:
-                try:
-                    row = min(self.cursor_row, self.file_editor.document.line_count - 1)
-                    line_length = len(self.file_editor.document.get_line(row))
-                    column = min(self.cursor_column, line_length)
-                    
-                    self.file_editor.focus()
-                    self.file_editor.move_cursor((row, column))
-                except Exception as e:
-                    print(f"Error restoring cursor: {e}")
+            self.file_editor.focus()
+                 
 
         elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("4"):
             self.file_editor.exit_editing()

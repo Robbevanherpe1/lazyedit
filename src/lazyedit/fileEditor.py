@@ -23,6 +23,7 @@ class FileEditor(TextArea):
         self.load_text(new_content)
         TextArea.read_only = False
         self.editing = True
+        self.disabled = False
 
     def save_file(self):
         if self.current_file:
@@ -30,6 +31,9 @@ class FileEditor(TextArea):
                 f.write(self.text)
 
     def exit_editing(self):
+        #self.focus()
+        self.read_only = True
+        self.disabled = True
         self.editing = False
         TextArea.read_only = True
         self.app.active_widget = self.app.directory
