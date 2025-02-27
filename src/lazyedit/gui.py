@@ -33,7 +33,7 @@ class MyApp(App):
         height: 100%;
     }
     Terminal {
-        height: 40%;  /* Increased from 30% to 40% */
+        height: 30%;
     }
     CommandFooter {
         dock: bottom;

@@ -22,7 +22,7 @@ class Directory(Static):
             f"[green]{file}[/green]" if i == self.selected_index else file
             for i, file in enumerate(self.files)
         )
-        self.update(Panel(Text.from_markup(file_list), title="Directory", border_style="yellow"))
+        self.update(Panel(Text.from_markup(file_list), title="Directory", border_style="#007FFF"))
 
     def on_key(self, event):
         if not self.browsing:

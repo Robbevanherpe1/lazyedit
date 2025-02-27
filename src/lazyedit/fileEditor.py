@@ -3,25 +3,33 @@ from textual.reactive import reactive
 from rich.style import Style
 from textual.widgets.text_area import TextAreaTheme
 
-class FileEditor(TextArea):
-    current_file: str = ""
-    editing: bool = reactive(False)
-
-    my_theme = TextAreaTheme(
+# Define the theme outside the class
+my_theme = TextAreaTheme(
     name="EditorTheme",
     cursor_style=Style(color="white", bgcolor="blue"),
-    cursor_line_style=Style(bgcolor="yellow"),
+    cursor_line_style=Style(bgcolor="#2a2a2a"),
     syntax_styles={
         "string": Style(color="red"),
         "comment": Style(color="magenta"),
     }
 )
-    #TextArea.theme = "EditorTheme"
+
+class FileEditor(TextArea):
+    current_file: str = ""
+    editing: bool = reactive(False)
+    
+    def __init__(self, *args, **kwargs):
+        # First initialize with default theme
+        super().__init__(*args, **kwargs)
+        # Then register our custom theme
+        self.register_theme(my_theme)
+        # Now we can set the theme
+        self.theme = "EditorTheme"
 
     def set_content(self, new_content, filename):
         self.current_file = filename
         self.load_text(new_content)
-        TextArea.read_only = False
+        self.read_only = False
         self.editing = True
         self.disabled = False
 
@@ -31,11 +39,8 @@ class FileEditor(TextArea):
                 f.write(self.text)
 
     def exit_editing(self):
-        #self.focus()
         self.read_only = True
         self.disabled = True
         self.editing = False
-        TextArea.read_only = True
         self.app.active_widget = self.app.directory
         self.app.directory.browsing = True
-

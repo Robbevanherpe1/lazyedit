@@ -14,10 +14,9 @@ import os
 class Terminal(Static):
     DEFAULT_CSS = """
     Terminal {
-        background: #0c0c0c;
-        color: #cccccc;
+        color: #007FFF;
         height: 1fr;
-        border: solid yellow;
+        border: solid #007FFF;
         padding: 0 1;
     }
     """
