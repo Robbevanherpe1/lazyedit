@@ -16,6 +16,14 @@
 pip install lazyedit
 ```
 
+## Run Localy Test
+
+```console
+hatch shell 
+pip instal
+lazyedit 
+```
+
 ## License
 
 `lazyedit` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.

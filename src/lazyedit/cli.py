@@ -31,7 +31,7 @@ class Terminal(Static):
 
 class CommandFooter(Static):
     def on_mount(self):
-        self.update("Commands: [q] Quit")
+        self.update("Commands: (q) Quit     (s) Save File")
 
 class MyApp(App):
     CSS = """
