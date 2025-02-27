@@ -1,3 +1,4 @@
+import keyboard
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, HorizontalScroll, Vertical
 from textual.widgets import Static
@@ -14,7 +15,7 @@ else:
 
 class CommandFooter(Static):
     def on_mount(self):
-        self.update("Commands: (q) Quit     (Ctrl+S) Save File    (Ctrl+1) Directory Mode    (Ctrl+2) File Editing Mode    (Ctrl+3) Terminal")
+        self.update("Commands: (Ctrl+q) Quit     (Ctrl+s) Save File    (Ctrl+1) Directory Mode    (Ctrl+2) File Editing Mode    (Ctrl+3) Terminal")
 
 class MyApp(App):
     CSS = """
@@ -62,16 +63,16 @@ class MyApp(App):
         self.active_widget = self.directory
 
     def on_key(self, event):
-        if event.key.lower() == "q":
+        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("q"):
             self.exit()
-        elif event.key == "ctrl+1":
+        elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("1"):
             self.file_editor.exit_editing()
             self.active_widget = self.directory
             self.directory.browsing = True
-        elif event.key == "ctrl+2":
+        elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("2"):
             self.active_widget = self.file_editor
             self.directory.browsing = False
-        elif event.key == "ctrl+3":
+        elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("3"):
             self.file_editor.exit_editing()
             self.active_widget = self.terminal
         elif event.key == "ctrl+s" and self.active_widget == self.file_editor:
