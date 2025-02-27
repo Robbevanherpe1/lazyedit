@@ -1,9 +1,22 @@
 from textual.widgets import TextArea
 from textual.reactive import reactive
+from rich.style import Style
+from textual.widgets.text_area import TextAreaTheme
 
 class FileEditor(TextArea):
     current_file: str = ""
     editing: bool = reactive(False)
+
+    my_theme = TextAreaTheme(
+    name="EditorTheme",
+    cursor_style=Style(color="white", bgcolor="blue"),
+    cursor_line_style=Style(bgcolor="yellow"),
+    syntax_styles={
+        "string": Style(color="red"),
+        "comment": Style(color="magenta"),
+    }
+)
+    #TextArea.theme = "EditorTheme"
 
     def set_content(self, new_content, filename):
         self.current_file = filename
