@@ -34,7 +34,7 @@ Issues = "https://github.com/Robbe/lazyedit/issues"
 Source = "https://github.com/Robbe/lazyedit"
 
 [project.scripts]
-lazyedit = "lazyedit.cli:run"
+lazyedit = "lazyedit.gui:run"
 
 [tool.hatch.version]
 path = "src/lazyedit/__about__.py"
