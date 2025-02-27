@@ -118,7 +118,7 @@ class Terminal(Static):
         return Panel(
             terminal_content,
             title="PowerShell" if sys.platform == "win32" else "Bash",
-            border_style="yellow",
+            border_style="#007FFF",
             box=box.ROUNDED
         )
     
