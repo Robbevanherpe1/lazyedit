@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.containers import HorizontalScroll, Horizontal, Vertical
+from textual.containers import Horizontal, HorizontalScroll, Vertical
 from textual.widgets import Static
 from textual.reactive import reactive
 from rich.panel import Panel
@@ -27,12 +27,20 @@ class FileEditor(Static):
 
 class Terminal(Static):
     def on_mount(self):
-        self.update(Panel("Awaiting query results...", title="Terminal", border_style="yellow"))
+        self.update(Panel("_", title="Terminal", border_style="yellow"))
+
+class CommandFooter(Static):
+    def on_mount(self):
+        self.update("Commands: [q] Quit")
 
 class MyApp(App):
     CSS = """
+    Screen {
+        layout: vertical;
+    }
     Horizontal {
-        height: 100%;
+        layout: horizontal;
+        height: 1fr;
     }
     Directory {
         width: 25%;
@@ -44,6 +52,10 @@ class MyApp(App):
     Terminal {
         height: 30%;
     }
+    CommandFooter {
+        dock: bottom;
+        height: auto;
+    }
     """
 
     def compose(self) -> ComposeResult:
@@ -53,6 +65,11 @@ class MyApp(App):
                 with HorizontalScroll():
                     yield FileEditor()
                 yield Terminal()
+        yield CommandFooter()
+
+    def on_key(self, event):
+        if event.key.lower() == "q":
+            self.exit()
 
 def run():
     MyApp().run()
