@@ -9,19 +9,17 @@ from .fileEditor import FileEditor
 from .directory import Directory
 from .terminal import Terminal
 
-if sys.platform == "win32":
-    import winpty
-else:
+if not sys.platform == "win32":
     import pty
 
 class CommandFooter(Static):
     def on_mount(self):
-        self.update("Commands: (Ctrl+q) Quit     (Ctrl+s) Save File    (Ctrl+1) Directory Mode    (Ctrl+2) File Editing Mode    (Ctrl+3) Terminal")
+        self.update("Commands: (Ctrl+q) Quit     (Ctrl+s) Save File    (Ctrl+2) Directory Mode    (Ctrl+3) File Editing Mode    (Ctrl+5) Terminal")
 
 class MyApp(App):
     CSS = """
     Screen {
-        layout: vertical;
+    layout: vertical;
     }
     Horizontal {
         layout: horizontal;
@@ -35,13 +33,17 @@ class MyApp(App):
         height: 100%;
     }
     Terminal {
-        height: 30%;
+        height: 40%;  /* Increased from 30% to 40% */
     }
     CommandFooter {
         dock: bottom;
         height: auto;
     }
     """
+
+
+
+
 
     def __init__(self):
         super().__init__()
@@ -70,23 +72,24 @@ class MyApp(App):
             self.exit()
 
         elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("2"):
-            
-            self.file_editor.exit_editing()
+            self.directory.browsing = True
             self.file_editor.editing = False
             self.active_widget = self.directory
-            self.directory.browsing = True
+            self.directory.focus()
+            self.file_editor.exit_editing()
 
         elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("3"):
             self.directory.browsing = False
             self.active_widget = self.file_editor
             self.file_editor.editing = True
             self.file_editor.focus()
-                 
 
-        elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("4"):
-            self.file_editor.exit_editing()
-            self.active_widget = self.terminal
+        elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("5"):
             self.directory.browsing = False
+            self.file_editor.editing = False
+            self.active_widget = self.terminal
+            self.terminal.focus()
+            self.file_editor.exit_editing()
 
         elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("s") and self.active_widget == self.file_editor:
             self.file_editor.save_file()
