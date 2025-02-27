@@ -17,6 +17,7 @@ else:
 class Directory(Static):
     selected_index: int = reactive(0)
     files: list = []
+    browsing: bool = reactive(True)
 
     def on_mount(self):
         self.update_directory()
@@ -33,6 +34,8 @@ class Directory(Static):
         self.update(Panel(Text.from_markup(file_list), title="Directory", border_style="yellow"))
 
     def on_key(self, event):
+        if not self.browsing:
+            return
         if event.key == "down" and self.selected_index < len(self.files) - 1:
             self.selected_index += 1
         elif event.key == "up" and self.selected_index > 0:
@@ -47,15 +50,22 @@ class Directory(Static):
 
 class FileEditor(TextArea):
     current_file: str = ""
+    editing: bool = reactive(False)
 
     def set_content(self, new_content, filename):
         self.current_file = filename
         self.load_text(new_content)
+        self.editing = True
 
     def save_file(self):
         if self.current_file:
             with open(self.current_file, "w", encoding="utf-8") as f:
                 f.write(self.text)
+
+    def exit_editing(self):
+        self.editing = False
+        self.app.active_widget = self.app.directory
+        self.app.directory.browsing = True
 
 class Terminal(Static):
     terminal_output: str = reactive("")
@@ -102,7 +112,7 @@ class Terminal(Static):
 
 class CommandFooter(Static):
     def on_mount(self):
-        self.update("Commands: (q) Quit     (Ctrl+S) Save File    (Ctrl+1) Directory    (Ctrl+2) File Editor    (Ctrl+3) Terminal")
+        self.update("Commands: (q) Quit     (Ctrl+S) Save File    (Ctrl+1) Directory Mode    (Ctrl+2) File Editing Mode    (Ctrl+3) Terminal")
 
 class MyApp(App):
     CSS = """
@@ -153,10 +163,14 @@ class MyApp(App):
         if event.key.lower() == "q":
             self.exit()
         elif event.key == "ctrl+1":
+            self.file_editor.exit_editing()
             self.active_widget = self.directory
+            self.directory.browsing = True
         elif event.key == "ctrl+2":
             self.active_widget = self.file_editor
+            self.directory.browsing = False
         elif event.key == "ctrl+3":
+            self.file_editor.exit_editing()
             self.active_widget = self.terminal
         elif event.key == "ctrl+s" and self.active_widget == self.file_editor:
             self.file_editor.save_file()
