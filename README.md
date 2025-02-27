@@ -19,6 +19,7 @@ pip install lazyedit
 ## Run Localy Test
 
 ```console
+hatch env create
 hatch shell 
 pip instal
 lazyedit 
