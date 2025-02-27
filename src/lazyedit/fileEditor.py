@@ -21,6 +21,7 @@ class FileEditor(TextArea):
     def set_content(self, new_content, filename):
         self.current_file = filename
         self.load_text(new_content)
+        TextArea.read_only = False
         self.editing = True
 
     def save_file(self):
@@ -30,6 +31,7 @@ class FileEditor(TextArea):
 
     def exit_editing(self):
         self.editing = False
+        TextArea.read_only = True
         self.app.active_widget = self.app.directory
         self.app.directory.browsing = True
 
