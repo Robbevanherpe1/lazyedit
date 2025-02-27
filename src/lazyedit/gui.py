@@ -9,9 +9,6 @@ from .fileEditor import FileEditor
 from .directory import Directory
 from .terminal import Terminal
 
-if not sys.platform == "win32":
-    import pty
-
 class CommandFooter(Static):
     def on_mount(self):
         self.update("Commands: (Ctrl+q) Quit     (Ctrl+s) Save File    (Ctrl+2) Directory Mode    (Ctrl+3) File Editing Mode    (Ctrl+5) Terminal")
@@ -40,10 +37,6 @@ class MyApp(App):
         height: auto;
     }
     """
-
-
-
-
 
     def __init__(self):
         super().__init__()
