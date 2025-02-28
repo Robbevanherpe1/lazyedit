@@ -16,7 +16,7 @@ class DeleteConfirmDialog(Container):
         file_name = os.path.basename(self.file_path)
         yield Label(f"Delete '{file_name}'?")
         
-        with Horizontal():
+        with Horizontal(id="button_container"):
             yield Button("Yes", id="yes_button", variant="primary")
             yield Button("No", id="no_button")
         
@@ -37,6 +37,15 @@ class DeleteConfirmDialog(Container):
         
         self.app.directory.browsing = True
         self.remove()
+    
+    def on_key(self, event):
+        if event.key == "left":
+            self.query_one("#yes_button").focus()
+        elif event.key == "right":
+            self.query_one("#no_button").focus()
+        elif event.key == "escape":
+            self.app.directory.browsing = True
+            self.remove()
 
 
 class FileNameDialog(Container):
@@ -69,6 +78,11 @@ class FileNameDialog(Container):
             except Exception as e:
                 self.app.notify(f"Error creating file: {str(e)}", severity="error")
                 self.remove()
+    
+    def on_key(self, event):
+        if event.key == "escape":
+            self.app.directory.browsing = True
+            self.remove()
 
 
 class Directory(Static):
