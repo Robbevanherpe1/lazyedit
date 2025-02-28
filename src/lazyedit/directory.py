@@ -10,6 +10,7 @@ class Directory(Static):
     files: list = []
     browsing: bool = reactive(True)
     expanded_folders: set = set()
+    scroll_offset: int = reactive(0)
 
     def on_mount(self):
         self.update_directory()
@@ -39,8 +40,29 @@ class Directory(Static):
             if os.path.isdir(file_path) and file_path in self.expanded_folders:
                 display_items.extend(self.get_nested_files(file_path, 1))
         
+        self.display_items = display_items
+        
+        # Calculate visible height
+        visible_height = self.size.height - 2  # Account for panel borders
+        if visible_height < 1:
+            visible_height = 10  # Default if size not available yet
+        
+        # Adjust scroll offset to keep selected item visible
+        if self.selected_index < self.scroll_offset:
+            self.scroll_offset = self.selected_index
+        elif self.selected_index >= self.scroll_offset + visible_height:
+            self.scroll_offset = self.selected_index - visible_height + 1
+        
+        # Ensure scroll offset is within bounds
+        max_scroll = max(0, len(display_items) - visible_height)
+        self.scroll_offset = max(0, min(self.scroll_offset, max_scroll))
+        
+        # Get visible items based on scroll offset
+        visible_items = display_items[self.scroll_offset:self.scroll_offset + visible_height]
+        
         file_list_items = []
-        for i, (file_path, indent_level) in enumerate(display_items):
+        for i, (file_path, indent_level) in enumerate(visible_items):
+            actual_index = i + self.scroll_offset
             prefix = "    " * indent_level
             file_name = os.path.basename(file_path)
             
@@ -54,15 +76,20 @@ class Directory(Static):
                 
             display_text = f"{prefix}{icon}{file_name}"
             
-            if i == self.selected_index:
+            if actual_index == self.selected_index:
                 file_list_items.append(f"[green]{display_text}[/green]")
             else:
                 file_list_items.append(display_text)
         
+        # Add scroll indicators if needed
+        title = "Directory"
+        if self.scroll_offset > 0:
+            title = "↑ " + title
+        if self.scroll_offset + visible_height < len(display_items):
+            title = title + " ↓"
+            
         file_list = "\n".join(file_list_items)
-        self.update(Panel(Text.from_markup(file_list), title="Directory", border_style="#007FFF"))
-        
-        self.display_items = display_items
+        self.update(Panel(Text.from_markup(file_list), title=title, border_style="#007FFF"))
 
     def on_key(self, event):
         if not self.browsing:
@@ -70,8 +97,10 @@ class Directory(Static):
         
         if event.key == "down" and self.selected_index < len(self.display_items) - 1:
             self.selected_index += 1
+            self.render_files()
         elif event.key == "up" and self.selected_index > 0:
             self.selected_index -= 1
+            self.render_files()
         elif event.key == "space":
             selected_path, _ = self.display_items[self.selected_index]
             
@@ -88,5 +117,3 @@ class Directory(Static):
                     self.app.file_editor.set_content(file_content, selected_path)
                 except Exception as e:
                     print(f"Error opening file: {e}")
-        
-        self.render_files()
