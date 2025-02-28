@@ -33,18 +33,19 @@ class Terminal(Static):
         self.process = None
         self.can_focus = True
         self.terminal_size = (24, 80) 
-        self.visible_lines = 20  
+        self.visible_lines = 20
+        self.prompt = "PS > "
     
     def on_mount(self):
         self.terminal_size = (self.size.height, self.size.width)
-        self.visible_lines = self.terminal_size[0] - 2  # Adjust for borders
+        self.visible_lines = self.terminal_size[0] - 2
         self.start_shell()
         self.set_interval(0.05, self.update_output)
     
     def on_resize(self, event):
         if hasattr(self, "size"):
             self.terminal_size = (self.size.height, self.size.width)
-            self.visible_lines = self.terminal_size[0] - 2  # Adjust for borders
+            self.visible_lines = self.terminal_size[0] - 2
     
     def start_shell(self):
         self.process = subprocess.Popen(
@@ -58,9 +59,9 @@ class Terminal(Static):
         
         threading.Thread(target=self._read_output, args=(self.process.stdout,), daemon=True).start()
         threading.Thread(target=self._read_output, args=(self.process.stderr,), daemon=True).start()
+        self.output_buffer.append(f"{self.prompt}")
     
     def _read_output(self, pipe):
-        """Read output from the process pipe and add it to the queue."""
         while self.process and self.process.poll() is None:
             try:
                 line = pipe.readline()
@@ -75,7 +76,6 @@ class Terminal(Static):
                 break
     
     def update_output(self):
-        """Process any pending output from the queue."""
         updated = False
         while not self.output_queue.empty():
             try:
@@ -99,20 +99,24 @@ class Terminal(Static):
             self.refresh()
     
     def render(self) -> RenderableType:
-        """Render the terminal content."""
-        content_lines = "".join(self.output_buffer).split("\n")
-        
-        visible_content = "\n".join(content_lines[-self.visible_lines:])
+        content = "".join(self.output_buffer)
+        content_lines = content.split("\n")
+        visible_content_lines = content_lines[-self.visible_lines:]
+        visible_content = "\n".join(visible_content_lines)
         
         if self.has_focus:
             cursor = "█"
-            prompt_line = (
+            input_line = (
                 self.input_buffer[:self.cursor_position] + 
                 cursor + 
                 self.input_buffer[self.cursor_position:]
             )
             
-            visible_content += "\n" + prompt_line
+            if not visible_content.endswith(self.prompt):
+                visible_content += self.prompt
+                
+            if visible_content.endswith(self.prompt):
+                visible_content = visible_content[:-len(self.prompt)] + self.prompt + input_line
         
         terminal_content = Text(visible_content)
         
@@ -124,7 +128,6 @@ class Terminal(Static):
         )
     
     def action_send_ctrl_c(self):
-        """Send Ctrl+C to the process."""
         if self.process and self.process.poll() is None:
             try:
                 self.process.send_signal(subprocess.signal.CTRL_C_EVENT)
@@ -132,7 +135,6 @@ class Terminal(Static):
                 self.write_to_terminal("\x03")
     
     def write_to_terminal(self, data):
-        """Write data to the terminal process."""
         if not self.process or self.process.poll() is not None:
             return
         
@@ -143,7 +145,6 @@ class Terminal(Static):
             self.output_buffer.append("[Process terminated]\n")
     
     def on_key(self, event: events.Key):
-        """Handle key events."""
         if not self.has_focus:
             return
         
@@ -152,10 +153,19 @@ class Terminal(Static):
         
         if event.key == "enter":
             command = self.input_buffer + "\n"
-            self.output_buffer.append(self.input_buffer + "\n")
+            
+            if self.output_buffer and self.output_buffer[-1].endswith(self.prompt):
+                self.output_buffer[-1] = self.output_buffer[-1][:-len(self.prompt)]
+            
+            self.output_buffer.append(f"{self.prompt}{self.input_buffer}\n")
+            
             self.input_buffer = ""
             self.cursor_position = 0
+            
             self.write_to_terminal(command)
+            
+            self.output_buffer.append(f"{self.prompt}")
+            
             self.refresh()
             
         elif event.key == "backspace":
@@ -195,12 +205,10 @@ class Terminal(Static):
             
         elif event.key == "tab":
             self.write_to_terminal("\t")
-            self.input_buffer += "    "
-            self.cursor_position += 4
             self.refresh()
             
         elif event.key == "ctrl+l":
-            self.output_buffer = []
+            self.output_buffer = [f"{self.prompt}"]
             self.refresh()
             
         elif event.is_printable:
@@ -219,7 +227,6 @@ class Terminal(Static):
         self.refresh()
         
     def on_unmount(self) -> None:
-        """Clean up when the widget is removed."""
         if self.process and self.process.poll() is None:
             self.process.terminate()
             try:
