@@ -3,6 +3,7 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal, HorizontalScroll, Vertical
 from textual.widgets import Static
 from textual.events import Key
+from textual.reactive import reactive
 import sys
 
 from .fileEditor import FileEditor
@@ -37,6 +38,8 @@ class MyApp(App):
         height: auto;
     }
     """
+    
+    current_mode = reactive("directory")
 
     def __init__(self):
         super().__init__()
@@ -60,35 +63,83 @@ class MyApp(App):
 
         self.active_widget = self.directory
 
+    def on_mount(self):
+        self.directory.browsing = True
+        self.file_editor.editing = False
+        self.terminal.is_active = False
+
     def on_key(self, event):
         if keyboard.is_pressed("ctrl") and keyboard.is_pressed("q"):
             self.exit()
-
-        elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("2"):
-            self.directory.browsing = True
-            self.file_editor.editing = False
-            self.active_widget = self.directory
-            self.directory.focus()
-            self.file_editor.exit_editing()
-
-        elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("3"):
-            self.directory.browsing = False
-            self.active_widget = self.file_editor
-            self.file_editor.editing = True
-            self.file_editor.focus()
-
-        elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("5"):
-            self.directory.browsing = False
-            self.file_editor.editing = False
-            self.active_widget = self.terminal
-            self.terminal.focus()
-            self.file_editor.exit_editing()
-
-        elif keyboard.is_pressed("ctrl") and keyboard.is_pressed("s") and self.active_widget == self.file_editor:
-            self.file_editor.save_file()
-
-        elif hasattr(self.active_widget, "on_key"):
-            self.active_widget.on_key(event)
+            return
+        
+        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("2"):
+            self.switch_to_directory_mode()
+            return
+            
+        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("3"):
+            self.switch_to_editor_mode()
+            return
+            
+        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("5"):
+            self.switch_to_terminal_mode()
+            return
+        
+        if self.current_mode == "directory":
+            if keyboard.is_pressed("ctrl") and keyboard.is_pressed("s"):
+                return
+            if hasattr(self.directory, "on_key"):
+                self.directory.on_key(event)
+                
+        elif self.current_mode == "editor":
+            if keyboard.is_pressed("ctrl") and keyboard.is_pressed("s"):
+                self.file_editor.save_file()
+                return
+            if hasattr(self.file_editor, "on_key"):
+                self.file_editor.on_key(event)
+                
+        elif self.current_mode == "terminal":
+            if hasattr(self.terminal, "on_key"):
+                self.terminal.on_key(event)
+    
+    def switch_to_directory_mode(self):
+        self.current_mode = "directory"
+        self.directory.browsing = True
+        self.file_editor.editing = False
+        self.terminal.is_active = False
+        self.active_widget = self.directory
+        self.directory.focus()
+        self.file_editor.exit_editing()
+        self.refresh_ui()
+    
+    def switch_to_editor_mode(self):
+        self.current_mode = "editor"
+        self.directory.browsing = False
+        self.file_editor.editing = True
+        self.terminal.is_active = False
+        self.active_widget = self.file_editor
+        self.file_editor.focus()
+        self.refresh_ui()
+    
+    def switch_to_terminal_mode(self):
+        self.current_mode = "terminal"
+        self.directory.browsing = False
+        self.file_editor.editing = False
+        self.terminal.is_active = True
+        self.active_widget = self.terminal
+        self.terminal.focus()
+        self.file_editor.exit_editing()
+        self.refresh_ui()
+    
+    def refresh_ui(self):
+        self.directory.render_files()
+        
+        if hasattr(self.terminal, "output_buffer"):
+            self.terminal.renderable = self.terminal.render()
+            self.terminal.refresh(layout=True)
+            
+        if hasattr(self.file_editor, "refresh"):
+            self.file_editor.refresh()
 
 def run():
     MyApp().run()

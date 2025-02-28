@@ -10,6 +10,7 @@ import subprocess
 import threading
 import queue
 import os
+import keyboard
 
 class Terminal(Static):
     DEFAULT_CSS = """
@@ -35,6 +36,8 @@ class Terminal(Static):
         self.terminal_size = (24, 80) 
         self.visible_lines = 20
         self.prompt = "PS > "
+        self.is_active = False
+        self._updating = False
     
     def on_mount(self):
         self.terminal_size = (self.size.height, self.size.width)
@@ -96,15 +99,24 @@ class Terminal(Static):
             self.output_buffer = self.output_buffer[-5000:]
         
         if updated:
-            self.refresh()
+            self.renderable = self.render()
+            self.refresh(layout=True)
     
     def render(self) -> RenderableType:
+        if not hasattr(self, "output_buffer") or self.output_buffer is None:
+            return Panel(
+                "",
+                title="PowerShell",
+                border_style="#555555",
+                box=box.ROUNDED
+            )
+            
         content = "".join(self.output_buffer)
         content_lines = content.split("\n")
-        visible_content_lines = content_lines[-self.visible_lines:]
+        visible_content_lines = content_lines[-self.visible_lines:] if content_lines else []
         visible_content = "\n".join(visible_content_lines)
         
-        if self.has_focus:
+        if self.has_focus and self.is_active:
             cursor = "█"
             input_line = (
                 self.input_buffer[:self.cursor_position] + 
@@ -120,14 +132,19 @@ class Terminal(Static):
         
         terminal_content = Text(visible_content)
         
+        border_style = "#007FFF" if self.is_active else "#555555"
+        
         return Panel(
             terminal_content,
             title="PowerShell",
-            border_style="#007FFF",
+            border_style=border_style,
             box=box.ROUNDED
         )
     
     def action_send_ctrl_c(self):
+        if not self.is_active:
+            return
+            
         if self.process and self.process.poll() is None:
             try:
                 self.process.send_signal(subprocess.signal.CTRL_C_EVENT)
@@ -145,8 +162,23 @@ class Terminal(Static):
             self.output_buffer.append("[Process terminated]\n")
     
     def on_key(self, event: events.Key):
-        if not self.has_focus:
+        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("q"):
             return
+        
+        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("2"):
+            return
+            
+        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("3"):
+            return
+            
+        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("5"):
+            return
+        
+        if not self.has_focus or not self.is_active:
+            return
+        
+        event.prevent_default()
+        event.stop()
         
         if event.key == "escape":
             return
@@ -166,7 +198,8 @@ class Terminal(Static):
             
             self.output_buffer.append(f"{self.prompt}")
             
-            self.refresh()
+            self.renderable = self.render()
+            self.refresh(layout=True)
             
         elif event.key == "backspace":
             if self.cursor_position > 0:
@@ -175,7 +208,8 @@ class Terminal(Static):
                     self.input_buffer[self.cursor_position:]
                 )
                 self.cursor_position -= 1
-                self.refresh()
+                self.renderable = self.render()
+                self.refresh(layout=True)
                 
         elif event.key == "delete":
             if self.cursor_position < len(self.input_buffer):
@@ -183,33 +217,40 @@ class Terminal(Static):
                     self.input_buffer[:self.cursor_position] + 
                     self.input_buffer[self.cursor_position + 1:]
                 )
-                self.refresh()
+                self.renderable = self.render()
+                self.refresh(layout=True)
                 
         elif event.key == "left":
             if self.cursor_position > 0:
                 self.cursor_position -= 1
-                self.refresh()
+                self.renderable = self.render()
+                self.refresh(layout=True)
                 
         elif event.key == "right":
             if self.cursor_position < len(self.input_buffer):
                 self.cursor_position += 1
-                self.refresh()
+                self.renderable = self.render()
+                self.refresh(layout=True)
                 
         elif event.key == "home":
             self.cursor_position = 0
-            self.refresh()
+            self.renderable = self.render()
+            self.refresh(layout=True)
             
         elif event.key == "end":
             self.cursor_position = len(self.input_buffer)
-            self.refresh()
+            self.renderable = self.render()
+            self.refresh(layout=True)
             
         elif event.key == "tab":
             self.write_to_terminal("\t")
-            self.refresh()
+            self.renderable = self.render()
+            self.refresh(layout=True)
             
         elif event.key == "ctrl+l":
             self.output_buffer = [f"{self.prompt}"]
-            self.refresh()
+            self.renderable = self.render()
+            self.refresh(layout=True)
             
         elif event.is_printable:
             self.input_buffer = (
@@ -218,13 +259,16 @@ class Terminal(Static):
                 self.input_buffer[self.cursor_position:]
             )
             self.cursor_position += 1
-            self.refresh()
+            self.renderable = self.render()
+            self.refresh(layout=True)
     
     def on_focus(self) -> None:
-        self.refresh()
+        self.renderable = self.render()
+        self.refresh(layout=True)
     
     def on_blur(self) -> None:
-        self.refresh()
+        self.renderable = self.render()
+        self.refresh(layout=True)
         
     def on_unmount(self) -> None:
         if self.process and self.process.poll() is None:
@@ -233,3 +277,6 @@ class Terminal(Static):
                 self.process.wait(timeout=1)
             except subprocess.TimeoutExpired:
                 self.process.kill()
+                
+    def refresh(self, **kwargs):
+        super().refresh(**kwargs)

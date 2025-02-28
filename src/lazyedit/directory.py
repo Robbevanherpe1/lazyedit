@@ -164,11 +164,17 @@ class Directory(Static):
             title = title + " ↓"
             
         file_list = "\n".join(file_list_items)
-        self.update(Panel(Text.from_markup(file_list), title=title, border_style="#007FFF"))
+        
+        border_style = "#007FFF" if self.browsing and self.app.current_mode == "directory" else "#555555"
+        
+        self.update(Panel(Text.from_markup(file_list), title=title, border_style=border_style))
 
     def on_key(self, event):
-        if not self.browsing:
+        if self.app.current_mode != "directory" or not self.browsing:
             return
+        
+        event.prevent_default()
+        event.stop()
         
         if event.key == "down" and self.selected_index < len(self.display_items) - 1:
             self.selected_index += 1
