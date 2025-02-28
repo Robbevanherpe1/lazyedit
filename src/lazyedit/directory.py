@@ -1,9 +1,42 @@
-from textual.widgets import Static, Input, Label
+from textual.widgets import Static, Input, Label, Button
 from textual.reactive import reactive
-from textual.containers import Container
+from textual.containers import Container, Horizontal
 from rich.panel import Panel
 from rich.text import Text
 import os
+import shutil
+
+
+class DeleteConfirmDialog(Container):
+    def __init__(self, file_path):
+        super().__init__()
+        self.file_path = file_path
+        
+    def compose(self):
+        file_name = os.path.basename(self.file_path)
+        yield Label(f"Delete '{file_name}'?")
+        
+        with Horizontal():
+            yield Button("Yes", id="yes_button", variant="primary")
+            yield Button("No", id="no_button")
+        
+    def on_mount(self):
+        self.query_one("#yes_button").focus()
+        
+    def on_button_pressed(self, event):
+        if event.button.id == "yes_button":
+            try:
+                if os.path.isdir(self.file_path):
+                    shutil.rmtree(self.file_path)
+                else:
+                    os.remove(self.file_path)
+                self.app.directory.update_directory()
+                self.app.notify(f"Deleted: {os.path.basename(self.file_path)}")
+            except Exception as e:
+                self.app.notify(f"Error deleting file: {str(e)}", severity="error")
+        
+        self.app.directory.browsing = True
+        self.remove()
 
 
 class FileNameDialog(Container):
@@ -146,6 +179,12 @@ class Directory(Static):
             else:
                 self.browsing = False
                 dialog = FileNameDialog(".")
+                self.app.mount(dialog)
+        elif event.key == "backspace" or event.key == "delete":
+            if self.selected_index < len(self.display_items):
+                selected_path, _ = self.display_items[self.selected_index]
+                self.browsing = False
+                dialog = DeleteConfirmDialog(selected_path)
                 self.app.mount(dialog)
                 
         elif event.key == "space":
