@@ -42,22 +42,18 @@ class Directory(Static):
         
         self.display_items = display_items
         
-        # Calculate visible height
-        visible_height = self.size.height - 2  # Account for panel borders
+        visible_height = self.size.height - 2 
         if visible_height < 1:
-            visible_height = 10  # Default if size not available yet
+            visible_height = 10
         
-        # Adjust scroll offset to keep selected item visible
         if self.selected_index < self.scroll_offset:
             self.scroll_offset = self.selected_index
         elif self.selected_index >= self.scroll_offset + visible_height:
             self.scroll_offset = self.selected_index - visible_height + 1
-        
-        # Ensure scroll offset is within bounds
+    
         max_scroll = max(0, len(display_items) - visible_height)
         self.scroll_offset = max(0, min(self.scroll_offset, max_scroll))
         
-        # Get visible items based on scroll offset
         visible_items = display_items[self.scroll_offset:self.scroll_offset + visible_height]
         
         file_list_items = []
@@ -81,7 +77,6 @@ class Directory(Static):
             else:
                 file_list_items.append(display_text)
         
-        # Add scroll indicators if needed
         title = "Directory"
         if self.scroll_offset > 0:
             title = "↑ " + title
