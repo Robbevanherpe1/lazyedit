@@ -1,5 +1,9 @@
 # LazyEdit - The Effortless TUI Code Editor
 
+[![PyPI - Version](https://img.shields.io/pypi/v/lazyedit.svg)](https://pypi.org/project/lazyedit)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/lazyedit.svg)](https://pypi.org/project/lazyedit)
+
+
 **_When you're too lazy to open a full IDE, but too productive for Notepad._**
   
 Code editing shouldn't be hard work. Be lazy. Be efficient.
