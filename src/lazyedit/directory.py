@@ -44,7 +44,7 @@ class Directory(Static):
         
         visible_height = self.size.height - 2 
         if visible_height < 1:
-            visible_height = 10
+            visible_height = 26
         
         if self.selected_index < self.scroll_offset:
             self.scroll_offset = self.selected_index
