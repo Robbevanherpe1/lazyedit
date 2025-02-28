@@ -10,7 +10,7 @@ Code editing shouldn't be hard work. Be lazy. Be efficient.
 
 LazyEdit is a lightweight, terminal-based code editor with an integrated PowerShell terminal designed for developers who want a streamlined editing experience without leaving the command line.
 
-![previeuw](12.gif)
+![preview](12.gif)
 
 ## ✨ Features
 - **All-in-One Interface**: File browser, text editor, and PowerShell terminal in a single window
@@ -59,12 +59,13 @@ You'll be greeted with a three-panel interface:
 - **Bottom panel**: PowerShell terminal
 
 ---
-
 ## 📖 Usage Guide
 ### **File Navigation**
 - Use **Directory Mode** (`Ctrl+2`) to browse files
 - Navigate with **arrow keys** to select a file
 - Press **Space** to open the selected file in the editor
+- Press **Enter** to create a new file
+- Press **Backspace** to delete a file
 
 ### **Editing Files**
 - Switch to **File Editing Mode** (`Ctrl+3`) to edit the opened file
@@ -79,18 +80,49 @@ You'll be greeted with a three-panel interface:
 ---
 
 ## ⌨️ Keyboard Shortcuts
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+Q` | Quit LazyEdit |
-| `Ctrl+S` | Save current file |
-| `Ctrl+2` | Switch to Directory Mode |
-| `Ctrl+3` | Switch to File Editing Mode |
-| `Ctrl+5` | Switch to Terminal Mode |
-| `Ctrl+C` | Send interrupt signal (in Terminal) |
-| `Ctrl+L` | Clear terminal screen |
-| `Space`  | Open selected file (in Directory Mode) |
-| `Up/Down` | Navigate files or text |
-| `Home/End` | Move to start/end of line |
+
+### **General Shortcuts**
+| Shortcut  | Action                         |
+|-----------|--------------------------------|
+| <kbd>Ctrl</kbd> + <kbd>Q</kbd>  | Quit LazyEdit                  |
+| <kbd>Ctrl</kbd> + <kbd>2</kbd>  | Switch to Directory Mode       |
+| <kbd>Ctrl</kbd> + <kbd>3</kbd>  | Switch to File Editing Mode    |
+| <kbd>Ctrl</kbd> + <kbd>5</kbd>  | Switch to Terminal Mode        |
+
+### **📂 Directory Mode**
+| Shortcut    | Action                                     |
+|-------------|--------------------------------------------|
+| <kbd>Enter</kbd>     | Create a new file in the current directory |
+| <kbd>Backspace</kbd> | Delete the selected file                  |
+| <kbd>Space</kbd>     | Open the selected file in the text editor  |
+| <kbd>↑</kbd> / <kbd>↓</kbd>  | Navigate the file list             |
+
+### **📝 File Editing Mode**
+| Shortcut   | Action                                  |
+|------------|-----------------------------------------|
+| <kbd>Ctrl</kbd> + <kbd>S</kbd>  | Save the currently open file |
+| <kbd>↑</kbd> / <kbd>↓</kbd>  | Move cursor line up/down               |
+| <kbd>Home</kbd> / <kbd>End</kbd>  | Move to start/end of the current line  |
+| <kbd>Ctrl</kbd> + <kbd>A</kbd>  | Select all text |
+| <kbd>Ctrl</kbd> + <kbd>X</kbd>  | Cut selected text |
+| <kbd>Ctrl</kbd> + <kbd>C</kbd>  | Copy selected text |
+| <kbd>Ctrl</kbd> + <kbd>V</kbd>  | Paste copied text |
+| <kbd>Ctrl</kbd> + <kbd>Z</kbd>  | Undo last action |
+| <kbd>Ctrl</kbd> + <kbd>Y</kbd>  | Redo last undone action |
+| <kbd>Ctrl</kbd> + <kbd>←</kbd>  | Move cursor one word left |
+| <kbd>Ctrl</kbd> + <kbd>→</kbd>  | Move cursor one word right |
+| <kbd>Shift</kbd> + <kbd>←</kbd>  | Select text left |
+| <kbd>Shift</kbd> + <kbd>→</kbd>  | Select text right |
+| <kbd>Ctrl</kbd> + <kbd>Backspace</kbd>  | Delete word left |
+| <kbd>Ctrl</kbd> + <kbd>Delete</kbd>  | Delete word right |
+| <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd>  | Delete current line |
+
+### **💻 Terminal Mode**
+| Shortcut   | Action                                    |
+|------------|-------------------------------------------|
+| <kbd>Ctrl</kbd> + <kbd>C</kbd>  | Send interrupt signal (in Terminal)      |
+| <kbd>Ctrl</kbd> + <kbd>L</kbd>  | Clear terminal screen                    |
+
 
 ---
 
@@ -134,3 +166,4 @@ lazyedit/
 LazyEdit is distributed under the terms of the **MIT license**.
 
 Made with ❤️ by **Robbe**
+
