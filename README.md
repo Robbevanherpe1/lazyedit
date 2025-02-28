@@ -82,7 +82,7 @@ You'll be greeted with a three-panel interface:
 Want to contribute or run from source? Follow these steps:
 ```sh
 # Clone the repository
-git clone https://github.com/yourusername/lazyedit.git
+git clone https://github.com/Robbevanherpe1/lazyedit.git
 cd lazyedit
 
 # Create and activate development environment
