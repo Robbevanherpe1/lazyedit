@@ -18,19 +18,26 @@ class Directory(Static):
         self.files = os.listdir(".")
         self.render_files()
 
+    def get_nested_files(self, folder_path, current_indent):
+        nested_items = []
+        try:
+            subfiles = [os.path.join(folder_path, f) for f in os.listdir(folder_path)]
+            for subfile in sorted(subfiles):
+                nested_items.append((subfile, current_indent))
+                if os.path.isdir(subfile) and subfile in self.expanded_folders:
+                    nested_items.extend(self.get_nested_files(subfile, current_indent + 1))
+        except (PermissionError, OSError):
+            pass
+        return nested_items
+
     def render_files(self):
         display_items = []
         
         for file_path in sorted(self.files):
-            display_items.append((file_path, 0))  
-           
+            display_items.append((file_path, 0))
+            
             if os.path.isdir(file_path) and file_path in self.expanded_folders:
-                try:
-                    subfiles = [os.path.join(file_path, f) for f in os.listdir(file_path)]
-                    for subfile in sorted(subfiles):
-                        display_items.append((subfile, 1))
-                except (PermissionError, OSError):
-                    pass
+                display_items.extend(self.get_nested_files(file_path, 1))
         
         file_list_items = []
         for i, (file_path, indent_level) in enumerate(display_items):
@@ -39,11 +46,11 @@ class Directory(Static):
             
             if os.path.isdir(file_path):
                 if file_path in self.expanded_folders:
-                    icon = "▼ "  
+                    icon = "▼ "
                 else:
                     icon = "▶ "
             else:
-                icon = "  " 
+                icon = "  "
                 
             display_text = f"{prefix}{icon}{file_name}"
             
