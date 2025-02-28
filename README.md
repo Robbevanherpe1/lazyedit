@@ -30,6 +30,13 @@ pip install lazyedit
 ```
 That's it! No complex setup or configuration required.
 
+If it fails to run your Python Scripts folder might not be in the system PATH.
+Run:
+```ps
+$env:Path += ";C:\Users\YourUserName\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\Scripts"
+```
+Now try running lazyedit again.
+
 ---
 
 ## 🏃‍♂️ Quick Start
