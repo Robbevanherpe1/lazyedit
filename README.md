@@ -1,4 +1,4 @@
-# LazyEdit - The Effortless Code Editor
+# LazyEdit - The Effortless TUI Code Editor
 
 **_When you're too lazy to open a full IDE, but too productive for Notepad._**
   
