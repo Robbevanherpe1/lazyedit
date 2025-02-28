@@ -28,9 +28,9 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/Robbe/lazyedit#readme"
-Issues = "https://github.com/Robbe/lazyedit/issues"
-Source = "https://github.com/Robbe/lazyedit"
+Documentation = "https://github.com/Robbevanherpe1/lazyedit#readme"
+Issues = "https://github.com/Robbevanherpe1/lazyedit/issues"
+Source = "https://github.com/Robbevanherpe1/lazyedit"
 
 [project.scripts]
 lazyedit = "lazyedit.gui:run"
