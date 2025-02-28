@@ -11,7 +11,7 @@ from .terminal import Terminal
 
 class CommandFooter(Static):
     def on_mount(self):
-        self.update("Commands: (Ctrl+q) Quit     (Ctrl+s) Save File    (Ctrl+2) Directory Mode    (Ctrl+3) File Editing Mode    (Ctrl+5) Terminal")
+        self.update("Commands: (Ctrl+q) Quit   (Enter) Create File   (Backspace) Delete File   (Ctrl+s) Save File   (Ctrl+2) Dir Mode    (Ctrl+3) Edit Mode    (Ctrl+5) Terminal")
 
 class MyApp(App):
     CSS = """
