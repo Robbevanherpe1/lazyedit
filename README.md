@@ -1,4 +1,4 @@
-# LazyEdit - The Effortless TUI Code Editor v0.0.2
+# LazyEdit - The Effortless TUI Code Editor v0.0.4
 
 [![PyPI - Version](https://img.shields.io/pypi/v/lazyedit.svg)](https://pypi.org/project/lazyedit)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/lazyedit.svg)](https://pypi.org/project/lazyedit)
