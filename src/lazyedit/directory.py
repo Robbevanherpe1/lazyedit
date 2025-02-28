@@ -132,23 +132,36 @@ class Directory(Static):
         elif event.key == "enter":
             if self.selected_index < len(self.display_items):
                 selected_path, _ = self.display_items[self.selected_index]
+                
                 if os.path.isdir(selected_path):
-                    self.browsing = False
-                    dialog = FileNameDialog(selected_path)
-                    self.app.mount(dialog)
-        elif event.key == "space":
-            selected_path, _ = self.display_items[self.selected_index]
-            
-            if os.path.isdir(selected_path):
-                if selected_path in self.expanded_folders:
-                    self.expanded_folders.remove(selected_path)
+                    directory_path = selected_path
                 else:
-                    self.expanded_folders.add(selected_path)
-                self.render_files()
-            elif os.path.isfile(selected_path):
-                try:
-                    with open(selected_path, "r", encoding="utf-8", errors="ignore") as f:
-                        file_content = f.read()
-                    self.app.file_editor.set_content(file_content, selected_path)
-                except Exception as e:
-                    self.app.notify(f"Error opening file: {str(e)}", severity="error")
+                    directory_path = os.path.dirname(selected_path)
+                    if not directory_path:
+                        directory_path = "."
+                
+                self.browsing = False
+                dialog = FileNameDialog(directory_path)
+                self.app.mount(dialog)
+            else:
+                self.browsing = False
+                dialog = FileNameDialog(".")
+                self.app.mount(dialog)
+                
+        elif event.key == "space":
+            if self.selected_index < len(self.display_items):
+                selected_path, _ = self.display_items[self.selected_index]
+                
+                if os.path.isdir(selected_path):
+                    if selected_path in self.expanded_folders:
+                        self.expanded_folders.remove(selected_path)
+                    else:
+                        self.expanded_folders.add(selected_path)
+                    self.render_files()
+                elif os.path.isfile(selected_path):
+                    try:
+                        with open(selected_path, "r", encoding="utf-8", errors="ignore") as f:
+                            file_content = f.read()
+                        self.app.file_editor.set_content(file_content, selected_path)
+                    except Exception as e:
+                        self.app.notify(f"Error opening file: {str(e)}", severity="error")
