@@ -1,4 +1,6 @@
 # LazyEdit - The Effortless Code Editor
+
+## _When you're too lazy to open a full IDE, but too productive for Notepad._
   
 Code editing shouldn't be hard work. Be lazy. Be efficient.
 
@@ -126,6 +128,4 @@ lazyedit/
 LazyEdit is distributed under the terms of the **MIT license**.
 
 Made with ❤️ by **Robbe**
-
-_When you're too lazy to open a full IDE, but too productive for Notepad._
 
