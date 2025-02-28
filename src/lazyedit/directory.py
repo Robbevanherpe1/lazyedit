@@ -1,8 +1,41 @@
-from textual.widgets import Static
+from textual.widgets import Static, Input, Label
 from textual.reactive import reactive
+from textual.containers import Container
 from rich.panel import Panel
 from rich.text import Text
 import os
+
+
+class FileNameDialog(Container):
+    def __init__(self, directory_path):
+        super().__init__()
+        self.directory_path = directory_path
+        
+    def compose(self):
+        yield Label("Enter file name:")
+        yield Input(id="filename_input")
+        
+    def on_mount(self):
+        self.query_one(Input).focus()
+        
+    def on_input_submitted(self, event):
+        filename = event.value.strip()
+        if filename:
+            file_path = os.path.join(self.directory_path, filename)
+            
+            try:
+                with open(file_path, "w") as f:
+                    pass
+                
+                self.app.directory.update_directory()
+                self.app.directory.browsing = True
+                self.remove()
+                
+                if os.path.isfile(file_path):
+                    self.app.file_editor.set_content("", file_path)
+            except Exception as e:
+                self.app.notify(f"Error creating file: {str(e)}", severity="error")
+                self.remove()
 
 
 class Directory(Static):
@@ -96,6 +129,13 @@ class Directory(Static):
         elif event.key == "up" and self.selected_index > 0:
             self.selected_index -= 1
             self.render_files()
+        elif event.key == "enter":
+            if self.selected_index < len(self.display_items):
+                selected_path, _ = self.display_items[self.selected_index]
+                if os.path.isdir(selected_path):
+                    self.browsing = False
+                    dialog = FileNameDialog(selected_path)
+                    self.app.mount(dialog)
         elif event.key == "space":
             selected_path, _ = self.display_items[self.selected_index]
             
@@ -111,4 +151,4 @@ class Directory(Static):
                         file_content = f.read()
                     self.app.file_editor.set_content(file_content, selected_path)
                 except Exception as e:
-                    print(f"Error opening file: {e}")
+                    self.app.notify(f"Error opening file: {str(e)}", severity="error")
