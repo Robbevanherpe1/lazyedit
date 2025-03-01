@@ -163,6 +163,6 @@ lazyedit/
 ---
 
 ## 📝 License
-LazyEdit is distributed under the terms of the **MIT license**.
+LazyEdit is distributed under the terms of the **EPL license**.
 
 Made with ❤️ by **Robbe**
