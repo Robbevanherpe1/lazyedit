@@ -99,7 +99,7 @@ You'll be greeted with a three-panel interface:
 - The terminal shows your current directory relative to where LazyEdit was launched
 
 ## 🐙 Git Integration
-lazyedit by Jesse Duffield's : [lazygit](https://github.com/jesseduffield/lazygit)
+lazyedit by Jesse Duffield : [lazygit](https://github.com/jesseduffield/lazygit)
 LazyEdit includes **LazyGit** for effortless repository management.
 
 ### **Launching LazyGit**
@@ -123,7 +123,7 @@ LazyEdit includes **LazyGit** for effortless repository management.
 | Quit LazyGit | Press `<Q>` |
 
 ## 🐙 Docker Integration
-lazydocker by Jesse Duffield's : [lazydocker](https://github.com/jesseduffield/lazydocker)
+lazydocker by Jesse Duffield : [lazydocker](https://github.com/jesseduffield/lazydocker)
 LazyDocker includes **LazyDocker** for effortless docker management.
 
 ### **Launching LazyDocker**
