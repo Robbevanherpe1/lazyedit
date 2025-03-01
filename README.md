@@ -116,6 +116,8 @@ You'll be greeted with a three-panel interface:
 | <kbd>Ctrl</kbd> + <kbd>Backspace</kbd>  | Delete word left |
 | <kbd>Ctrl</kbd> + <kbd>Delete</kbd>  | Delete word right |
 | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd>  | Delete current line |
+| <kbd>f6</kbd>  | Select the current line |
+| <kbd>f7</kbd>  | Select all text in the document |
 
 ### **💻 Terminal Mode**
 | Shortcut   | Action                                    |
