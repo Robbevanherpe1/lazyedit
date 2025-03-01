@@ -36,6 +36,10 @@ LazyEdit is a lightweight, terminal-based code editor with an integrated PowerSh
 ```sh
 pip install lazyedit
 ```
+Optional lazyGit when u want to use git feature
+```sh
+pip install lazygit
+```
 That's it! No complex setup or configuration required.
 
 If it fails to run your Python Scripts folder might not be in the system PATH.
@@ -84,6 +88,30 @@ You'll be greeted with a three-panel interface:
 - Execute commands as you would in a normal PowerShell window
 - The terminal shows your current directory relative to where LazyEdit was launched
 
+## 🐙 Git Integration
+lazyedit by Jesse Duffield's : [lazygit](https://github.com/jesseduffield/lazygit)
+LazyEdit includes **LazyGit** for effortless repository management.
+
+### **Launching LazyGit**
+- Switch to **Git Mode** using `Ctrl+g`.
+- This opens **LazyGit** in a separate floating window.
+- You can manage branches, commits, merges, and pull requests from LazyGit without leaving LazyEdit.
+
+### **Common Git Commands via LazyGit**
+| Action           | Command in LazyGit |
+|-----------------|------------------|
+| Stage changes  | Select file + Press `<Space>` |
+| Unstage changes | Select file + Press `<U>` |
+| Commit changes  | Press `<C>` and enter message |
+| Push to remote  | Press `<P>` |
+| Pull from remote | Press `<Shift+P>` |
+| Switch branches | Press `<B>` |
+| Create new branch | Press `<N>` |
+| Merge branches | Press `<M>` |
+| Stash changes | Press `<S>` |
+| View logs & history | Press `<L>` |
+| Quit LazyGit | Press `<Q>` |
+
 ---
 
 ## ⌨️ Keyboard Shortcuts
@@ -95,6 +123,7 @@ You'll be greeted with a three-panel interface:
 | <kbd>Ctrl</kbd> + <kbd>2</kbd>  | Switch to Directory Mode       |
 | <kbd>Ctrl</kbd> + <kbd>3</kbd>  | Switch to File Editing Mode    |
 | <kbd>Ctrl</kbd> + <kbd>5</kbd>  | Switch to Terminal Mode        |
+| <kbd>Ctrl</kbd> + <kbd>g</kbd>  | Switch to Git Mode        |
 
 ### **📂 Directory Mode**
 | Shortcut    | Action                                     |
@@ -160,10 +189,11 @@ lazyedit/
 │   └── lazyedit/
 │       ├── __init__.py
 │       ├── __about__.py
-│       ├── directory.py    # File browser functionality
-│       ├── fileEditor.py   # Text editing functionality
-│       ├── gui.py          # Main application interface
-│       └── terminal.py     # PowerShell terminal integration
+|       ├── lazygit_screen.py # Lazygit screen integration
+│       ├── directory.py      # File browser functionality
+│       ├── fileEditor.py     # Text editing functionality
+│       ├── gui.py            # Main application interface
+│       └── terminal.py       # PowerShell terminal integration
 ├── tests/
 │       ├── directory/
 │       ├── fileEdit/
