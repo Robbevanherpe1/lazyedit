@@ -167,3 +167,4 @@ LazyEdit is distributed under the terms of the **MIT license**.
 
 Made with ❤️ by **Robbe**
 
+<iframe src="https://github.com/sponsors/Robbevanherpe1/card" title="Sponsor Robbevanherpe1" height="225" width="600" style="border: 0;"></iframe>
