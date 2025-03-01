@@ -10,7 +10,7 @@ Code editing shouldn't be hard work. Be lazy. Be efficient.
 
 LazyEdit is a lightweight, terminal-based code editor with an integrated PowerShell terminal designed for developers who want a streamlined editing experience without leaving the command line.
 
-![preview](12.gif)
+![preview](previewNew.gif)
 
 ## ✨ Features
 - **All-in-One Interface**: File browser, text editor, and PowerShell terminal in a single window
