@@ -63,3 +63,21 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
 ]
+[tool.hatch.envs.default.scripts]
+post-install = """
+import os
+import sys
+import shutil
+import subprocess
+
+# Only install LazyGit on Windows
+if sys.platform.startswith('win'):
+    if shutil.which("lazygit") is None:
+        print("⏳ Installing LazyGit using pip...")
+        try:
+            subprocess.run([sys.executable, "-m", "pip", "install", "lazygit"], check=True)
+            print("✅ LazyGit installed successfully!")
+        except Exception as e:
+            print(f"⚠️ LazyGit installation failed: {e}. Please install manually using:")
+            print("   pip install lazygit")
+"""

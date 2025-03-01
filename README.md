@@ -36,10 +36,6 @@ LazyEdit is a lightweight, terminal-based code editor with an integrated PowerSh
 ```sh
 pip install lazyedit
 ```
-Optional lazyGit when u want to use git feature
-```sh
-pip install lazygit
-```
 That's it! No complex setup or configuration required.
 
 If it fails to run your Python Scripts folder might not be in the system PATH.
@@ -54,6 +50,11 @@ Run Permanent:
 [System.Environment]::GetEnvironmentVariable("Path", "User") -split ";" | Out-File -FilePath "$env:TEMP\PathBackup.txt"
 [System.Environment]::SetEnvironmentVariable("Path", $newPath, "User")
 $newPath = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";C:\Users\YourUserName\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\Scripts"
+```
+
+Optional lazyGit when u want to use git feature and didn't download
+```sh
+pip install lazygit
 ```
 
 Now try running lazyedit again.
