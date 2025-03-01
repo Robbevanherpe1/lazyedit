@@ -5,6 +5,7 @@ from textual.widgets import Static
 from textual.events import Key
 from textual.reactive import reactive
 import sys
+import os
 
 from .fileEditor import FileEditor
 from .directory import Directory
@@ -12,12 +13,13 @@ from .terminal import Terminal
 
 class CommandFooter(Static):
     def on_mount(self):
-        self.update("Commands: (Ctrl+q) Quit   (Enter) Create File   (Backspace) Delete File   (Ctrl+s) Save File   (Ctrl+2) Dir Mode    (Ctrl+3) Edit Mode    (Ctrl+5) Terminal")
+        self.update("Commands: (Ctrl+q) Quit   (Enter) Create File   (Backspace) Delete File   (Ctrl+s) Save File   (Ctrl+2) Dir Mode    (Ctrl+3) Edit Mode    (Ctrl+5) Terminal   (Ctrl+g) Git mode")
 
 class MyApp(App):
     CSS = """
     Screen {
     layout: vertical;
+    background: #0C0C0C;
     }
     Horizontal {
         layout: horizontal;
@@ -71,6 +73,7 @@ class MyApp(App):
     def on_key(self, event):
         if keyboard.is_pressed("ctrl") and keyboard.is_pressed("q"):
             self.exit()
+            os.system("cls")
             return
         
         if keyboard.is_pressed("ctrl") and keyboard.is_pressed("2"):
@@ -83,6 +86,11 @@ class MyApp(App):
             
         if keyboard.is_pressed("ctrl") and keyboard.is_pressed("5"):
             self.switch_to_terminal_mode()
+            return
+        
+        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("g"):
+            from .lazygit_screen import LazyGitScreen
+            self.push_screen(LazyGitScreen())
             return
         
         if self.current_mode == "directory":

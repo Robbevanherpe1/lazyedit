@@ -6,7 +6,7 @@ import os
 
 my_theme = TextAreaTheme(
     name="EditorTheme",
-    #base_style=Style(color="#f8f8f2", bgcolor="none"),
+    base_style=Style(bgcolor="#0C0C0C"),
     cursor_style=Style(color="white", bgcolor="blue"),
     cursor_line_style=Style(bgcolor="#2a2a2a"),
     #gutter_style=Style(color="#90908a", bgcolor="#272822"),
