@@ -3,9 +3,9 @@ from textual.widgets import Static
 import subprocess
 import threading
 
-class LazyGitScreen(Screen):
+class LazyDockerScreen(Screen):
     DEFAULT_CSS = """
-    LazyGitScreen {
+    LazyDockerScreen {
         layout: vertical;
         color: white;
         text-align: center;
@@ -19,28 +19,28 @@ class LazyGitScreen(Screen):
         self.process = None
 
     def compose(self):
-        yield Static("LazyGit is running... Close LazyGit to return.", id="lazygit-message")
+        yield Static("LazyDocker is running... Close LazyDocker to return.", id="lazydocker-message")
 
     def on_mount(self):
-        self.run_lazygit()
+        self.run_lazydocker()
 
-    def run_lazygit(self):
+    def run_lazydocker(self):
         try:
-            self.process = subprocess.Popen(["lazygit"], text=True)
-            threading.Thread(target=self.monitor_lazygit, daemon=True).start()
+            self.process = subprocess.Popen(["lazydocker"], text=True)
+            threading.Thread(target=self.monitor_lazydocker, daemon=True).start()
         except FileNotFoundError:
             self.app.pop_screen()
-            self.app.notify("LazyGit not found! Please install it.", severity="error")
+            self.app.notify("LazyDocker not found! Please install it.", severity="error")
         except Exception as e:
             self.app.pop_screen()
-            self.app.notify(f"Error launching LazyGit: {str(e)}", severity="error")
+            self.app.notify(f"Error launching LazyDocker: {str(e)}", severity="error")
 
-    def monitor_lazygit(self):
+    def monitor_lazydocker(self):
         if self.process:
             self.process.wait()
-            self.app.call_from_thread(self.exit_lazygit_screen)
+            self.app.call_from_thread(self.exit_lazydocker_screen)
 
-    def exit_lazygit_screen(self):
+    def exit_lazydocker_screen(self):
         if self.app.screen == self:
             self.app.pop_screen()
 

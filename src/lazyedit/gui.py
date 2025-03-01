@@ -7,6 +7,8 @@ from textual.reactive import reactive
 import sys
 import os
 
+from lazyedit.lazydocker_screen import LazyDockerScreen
+
 from .fileEditor import FileEditor
 from .directory import Directory
 from .terminal import Terminal
@@ -71,6 +73,7 @@ class MyApp(App):
         self.terminal.is_active = False
 
     def on_key(self, event):
+    
         if keyboard.is_pressed("ctrl") and keyboard.is_pressed("q"):
             self.exit()
             os.system("cls")
@@ -91,6 +94,11 @@ class MyApp(App):
         if keyboard.is_pressed("ctrl") and keyboard.is_pressed("g"):
             from .lazygit_screen import LazyGitScreen
             self.push_screen(LazyGitScreen())
+            return
+        
+        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("d"):
+            from .lazygit_screen import LazyGitScreen
+            self.push_screen(LazyDockerScreen())
             return
         
         if self.current_mode == "directory":
