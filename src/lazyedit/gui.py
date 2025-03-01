@@ -7,7 +7,8 @@ from textual.reactive import reactive
 import sys
 import os
 
-from lazyedit.lazydocker_screen import LazyDockerScreen
+from .lazydocker_screen import LazyDockerScreen
+from .lazygit_screen import LazyGitScreen
 
 from .fileEditor import FileEditor
 from .directory import Directory
@@ -92,12 +93,10 @@ class MyApp(App):
             return
         
         if keyboard.is_pressed("ctrl") and keyboard.is_pressed("g"):
-            from .lazygit_screen import LazyGitScreen
             self.push_screen(LazyGitScreen())
             return
         
         if keyboard.is_pressed("ctrl") and keyboard.is_pressed("d"):
-            from .lazygit_screen import LazyGitScreen
             self.push_screen(LazyDockerScreen())
             return
         

@@ -53,8 +53,17 @@ $newPath = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";C:\U
 ```
 
 Optional lazyGit when u want to use git feature and didn't download
-```sh
+```powershell
 pip install lazygit
+```
+Optional lazyDocker when u want to use docker feature and didn't download
+```powershell
+choco install lazydocker
+```
+
+If you don’t see the "default" context, set it manually:
+```powershell
+docker context use default
 ```
 
 Now try running lazyedit again.
@@ -97,6 +106,15 @@ LazyEdit includes **LazyGit** for effortless repository management.
 - Switch to **Git Mode** using `Ctrl+g`.
 - This opens **LazyGit** in a separate floating window.
 - You can manage branches, commits, merges, and pull requests from LazyGit without leaving LazyEdit.
+
+## 🐙 Docker Integration
+lazydocker by Jesse Duffield's : [lazydocker](https://github.com/jesseduffield/lazydocker)
+LazyDocker includes **LazyDocker** for effortless docker management.
+
+### **Launching LazyDocker**
+- Switch to **Docker Mode** using `Ctrl+d`.
+- This opens **LazyDocker** in a separate floating window.
+- You can manage containers, images, volumes, merges, and networks from LazyDocker without leaving LazyEdit.
 
 ### **Common Git Commands via LazyGit**
 | Action           | Command in LazyGit |
@@ -190,11 +208,12 @@ lazyedit/
 │   └── lazyedit/
 │       ├── __init__.py
 │       ├── __about__.py
-|       ├── lazygit_screen.py # Lazygit screen integration
-│       ├── directory.py      # File browser functionality
-│       ├── fileEditor.py     # Text editing functionality
-│       ├── gui.py            # Main application interface
-│       └── terminal.py       # PowerShell terminal integration
+|       ├── lazydocker_screen.py # Lazydocker screen integration
+|       ├── lazygit_screen.py    # Lazygit screen integration
+│       ├── directory.py         # File browser functionality
+│       ├── fileEditor.py        # Text editing functionality
+│       ├── gui.py               # Main application interface
+│       └── terminal.py          # PowerShell terminal integration
 ├── tests/
 │       ├── directory/
 │       ├── fileEdit/
