@@ -54,7 +54,7 @@ $newPath = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";C:\U
 
 Optional lazyGit when u want to use git feature and didn't download
 ```powershell
-pip install lazygit
+choco install lazygit
 ```
 Optional lazyDocker when u want to use docker feature and didn't download
 ```powershell
