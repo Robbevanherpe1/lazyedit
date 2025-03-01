@@ -173,4 +173,6 @@ lazyedit/
 ## 📝 License
 LazyEdit is distributed under the terms of the **EPL license**.
 
-Made with ❤️ by **Robbe**
+Made with ❤️ by **Robbe*
+
+_Inspiration by Jesse Duffield's lazygit and lazydocker_
