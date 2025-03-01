@@ -1,8 +1,10 @@
 from textual.widgets import TextArea
 from textual.reactive import reactive
+from textual.binding import Binding 
 from rich.style import Style
 from textual.widgets.text_area import TextAreaTheme
 import os
+import pyperclip
 
 my_theme = TextAreaTheme(
     name="EditorTheme",
@@ -318,6 +320,18 @@ my_theme = TextAreaTheme(
 class FileEditor(TextArea):
     current_file: str = ""
     editing: bool = reactive(False)
+
+    BINDINGS = [
+        Binding("ctrl+c", "copy", "Copy"),
+        Binding("ctrl+x", "cut", "Cut"),
+        Binding("ctrl+v", "paste", "Paste"),
+        Binding("ctrl+z", "undo", "Undo"),
+        Binding("ctrl+y", "redo", "Redo"),
+        Binding("ctrl+a", "select_all", "Select All"),
+        Binding("ctrl+shift+k", "delete_line", "Delete Line"),
+        Binding("f6", "select_line", "Select Line"),
+        Binding("f7", "select_all", "Select All"),
+    ]
     
     EXTENSION_TO_LANGUAGE = {
         ".py": "python",
@@ -421,3 +435,31 @@ class FileEditor(TextArea):
         self.editing = False
         self.app.active_widget = self.app.directory
         self.app.directory.browsing = True
+
+    def action_copy(self) -> None:
+        if self.selection:
+            try:
+                text = self.selected_text
+                self.app.clipboard = text
+                
+                print(f"Attempting to copy text: '{text[:50]}{'...' if len(text) > 50 else ''}'")
+                
+                pyperclip.copy(text)
+                
+                clipboard_content = pyperclip.paste()
+                if clipboard_content == text:
+                    self.app.notify("Text copied to clipboard successfully")
+                    print("Copy verification successful")
+                else:
+                    self.app.notify(f"Copy may have failed - clipboard contains different text")
+                    print(f"Expected: '{text[:50]}...'")
+                    print(f"Got: '{clipboard_content[:50]}...'")
+                    
+            except Exception as e:
+                error_msg = f"Failed to copy: {str(e)}"
+                self.app.notify(error_msg)
+                print(error_msg)
+                import traceback
+                traceback.print_exc()
+        else:
+            self.app.notify("No text selected")
