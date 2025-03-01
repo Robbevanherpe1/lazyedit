@@ -107,15 +107,6 @@ LazyEdit includes **LazyGit** for effortless repository management.
 - This opens **LazyGit** in a separate floating window.
 - You can manage branches, commits, merges, and pull requests from LazyGit without leaving LazyEdit.
 
-## 🐙 Docker Integration
-lazydocker by Jesse Duffield's : [lazydocker](https://github.com/jesseduffield/lazydocker)
-LazyDocker includes **LazyDocker** for effortless docker management.
-
-### **Launching LazyDocker**
-- Switch to **Docker Mode** using `Ctrl+d`.
-- This opens **LazyDocker** in a separate floating window.
-- You can manage containers, images, volumes, merges, and networks from LazyDocker without leaving LazyEdit.
-
 ### **Common Git Commands via LazyGit**
 | Action           | Command in LazyGit |
 |-----------------|------------------|
@@ -130,6 +121,38 @@ LazyDocker includes **LazyDocker** for effortless docker management.
 | Stash changes | Press `<S>` |
 | View logs & history | Press `<L>` |
 | Quit LazyGit | Press `<Q>` |
+
+## 🐙 Docker Integration
+lazydocker by Jesse Duffield's : [lazydocker](https://github.com/jesseduffield/lazydocker)
+LazyDocker includes **LazyDocker** for effortless docker management.
+
+### **Launching LazyDocker**
+- Switch to **Docker Mode** using `Ctrl+d`.
+- This opens **LazyDocker** in a separate floating window.
+- You can manage containers, images, volumes, merges, and networks from LazyDocker without leaving LazyEdit.
+
+### **Common Docker Commands via LazyDocker**
+| Action           | Command in LazyDocker |
+|-----------------|------------------|
+| Navigate panels | Press `<Tab>` or arrow keys |
+| Select item | Press `<Enter>` |
+| View container logs | Select container + Press `<l>` |
+| Start container | Select container + Press `<s>` |
+| Stop container | Select container + Press `<S>` |
+| Restart container | Select container + Press `<r>` |
+| Remove container | Select container + Press `<d>` |
+| View container stats | Select container + Press `<e>` |
+| Attach to container | Select container + Press `<a>` |
+| Execute command in container | Select container + Press `<E>` |
+| View image details | Select image + Press `<i>` |
+| Remove image | Select image + Press `<d>` |
+| Pull image | Select image + Press `<p>` |
+| View volume details | Select volume + Press `<v>` |
+| Remove volume | Select volume + Press `<d>` |
+| Filter items | Press `<f>` |
+| Toggle view mode | Press `<m>` |
+| Quit LazyDocker | Press `<q>` |
+
 
 ---
 
