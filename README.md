@@ -157,6 +157,12 @@ lazyedit/
 │       ├── fileEditor.py   # Text editing functionality
 │       ├── gui.py          # Main application interface
 │       └── terminal.py     # PowerShell terminal integration
+├── tests/
+│       ├── directory/
+│       ├── fileEdit/
+│       ├── terminal/
+│       ├── __init__.py
+│       └── test_basic.py
 ├── pyproject.toml
 ├── README.md
 └── LICENSE.txt
