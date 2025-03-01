@@ -1,9 +1,11 @@
 import keyboard
+import signal
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, HorizontalScroll, Vertical
 from textual.widgets import Static
 from textual.events import Key
 from textual.reactive import reactive
+from textual.binding import Binding
 import sys
 import os
 
@@ -44,6 +46,11 @@ class MyApp(App):
     }
     """
     
+    BINDINGS = [
+        Binding("ctrl+q", "quit", "Quit"),
+        Binding("ctrl+c", "handle_copy", "Copy"),
+    ]
+    
     current_mode = reactive("directory")
 
     def __init__(self):
@@ -69,15 +76,30 @@ class MyApp(App):
         self.active_widget = self.directory
 
     def on_mount(self):
+        def sigint_handler(sig, frame):
+            self.notify("Use Ctrl+Q to quit")
+            return True
+        
+        signal.signal(signal.SIGINT, sigint_handler)
+        
         self.directory.browsing = True
         self.file_editor.editing = False
         self.terminal.is_active = False
 
-    def on_key(self, event):
+    def action_handle_copy(self) -> None:
+        focused = self.focused
+        if focused and hasattr(focused, "action_copy"):
+            focused.action_copy()
+        else:
+            self.notify("Use Ctrl+Q to quit")
     
+    def action_quit(self) -> None:
+        self.exit()
+        os.system("cls" if os.name == "nt" else "clear")
+
+    def on_key(self, event):
         if keyboard.is_pressed("ctrl") and keyboard.is_pressed("q"):
-            self.exit()
-            os.system("cls")
+            self.action_quit()
             return
         
         if keyboard.is_pressed("ctrl") and keyboard.is_pressed("2"):
@@ -157,4 +179,7 @@ class MyApp(App):
             self.file_editor.refresh()
 
 def run():
-    MyApp().run()
+    try:
+        MyApp().run()
+    except KeyboardInterrupt:
+        print("Application terminated by user")
