@@ -33,6 +33,12 @@ LazyEdit is a lightweight, terminal-based code editor with an integrated PowerSh
 ---
 
 ## 🚀 Installation
+
+
+**requirements**
+- Chocolatey
+- pip
+
 ```sh
 pip install lazyedit
 ```
