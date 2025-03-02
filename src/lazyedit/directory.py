@@ -130,7 +130,7 @@ class Directory(Static):
             self.scroll_offset = self.selected_index
         elif self.selected_index >= self.scroll_offset + visible_height:
             self.scroll_offset = self.selected_index - visible_height + 1
-    
+
         max_scroll = max(0, len(display_items) - visible_height)
         self.scroll_offset = max(0, min(self.scroll_offset, max_scroll))
         
@@ -141,6 +141,11 @@ class Directory(Static):
             actual_index = i + self.scroll_offset
             prefix = "    " * indent_level
             file_name = os.path.basename(file_path)
+            
+            if (not os.path.isdir(file_path) and 
+                hasattr(self.app, 'file_editor') and 
+                self.app.file_editor.has_unsaved_changes(file_path)):
+                file_name = f"{file_name} *"
             
             if os.path.isdir(file_path):
                 if file_path in self.expanded_folders:
@@ -168,6 +173,7 @@ class Directory(Static):
         border_style = "#007FFF" if self.browsing and self.app.current_mode == "directory" else "#555555"
         
         self.update(Panel(Text.from_markup(file_list), title=title, border_style=border_style))
+
 
     def on_key(self, event):
         if self.app.current_mode != "directory" or not self.browsing:

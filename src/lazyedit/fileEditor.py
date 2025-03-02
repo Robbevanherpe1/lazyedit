@@ -328,6 +328,7 @@ class FileEditor(TextArea):
     is_undoing: bool = False
     is_redoing: bool = False
     last_saved_state: Optional[str] = None
+    unsaved_files: dict = {}
 
     BINDINGS = [
         Binding("up", "cursor_up", "Cursor up", show=False),
@@ -421,6 +422,8 @@ class FileEditor(TextArea):
         self.redo_stack = []
         self.last_saved_state = new_content
         self.save_current_state()
+
+        self.unsaved_files[filename] = False
         
         self.set_language_from_filename(filename)
 
@@ -464,9 +467,15 @@ class FileEditor(TextArea):
             with open(self.current_file, "w", encoding="utf-8") as f:
                 f.write(self.text)
             self.last_saved_state = self.text
+            self.unsaved_files[self.current_file] = False
             self.app.notify(f"Saved: {self.current_file}")
 
+            if hasattr(self.app, 'directory'):
+                self.app.directory.render_files()
+
     def exit_editing(self):
+        if self.unsaved_files[self.current_file]:
+            self.app.notify("Warning: You have unsaved changes!")
         self.read_only = True
         self.disabled = True
         self.editing = False
@@ -606,6 +615,14 @@ class FileEditor(TextArea):
             
         self.idle_timer = self.set_timer(0.5, self.save_current_state)
 
+        if self.text == self.last_saved_state:
+            self.unsaved_files[self.current_file] = False
+        else:
+            self.unsaved_files[self.current_file] = True
+
+        if hasattr(self.app, 'directory'):
+                self.app.directory.render_files()
+
     def on_key(self, event) -> None:
         key_combo = event.key
         
@@ -619,4 +636,9 @@ class FileEditor(TextArea):
         
         elif key_combo in logical_edit_keys:
             self.save_current_state()
+
+    def has_unsaved_changes(self, file_path=None) -> bool:
+        if file_path is None:
+            file_path = self.current_file
+        return self.unsaved_files.get(file_path, False)
     
