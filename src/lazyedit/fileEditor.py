@@ -323,8 +323,11 @@ my_theme = TextAreaTheme(
 class FileEditor(TextArea):
     current_file: str = ""
     editing: bool = reactive(False)
-    undo_stack: List[EditOperation] = []
-    redo_stack: List[EditOperation] = []
+
+    #undo_stack: List[EditOperation] = []
+    #redo_stack: List[EditOperation] = []
+    file_states: dict = {}
+
     is_undoing: bool = False
     is_redoing: bool = False
     last_saved_state: Optional[str] = None
@@ -407,25 +410,112 @@ class FileEditor(TextArea):
         self.change_timer = None
         self.idle_timer = None
         self.MAX_UNDO_STACK = 100
+        self.file_states = {} 
+        self.unsaved_files = {}
+    
         
         print(f"Available languages: {self.available_languages}")
         print(f"Available themes: {self.available_themes}")
 
     def set_content(self, new_content, filename):
+        if self.current_file and self.current_file != filename:
+            self._save_file_state()
+        
         self.current_file = filename
+
+        first_time_opening = filename not in self.file_states
+
+        if filename not in self.file_states:
+            self.file_states[filename] = {
+                'undo_stack': [],
+                'redo_stack': [],
+                'last_saved_state': new_content
+            }
+        else:
+            self._load_file_state()
+        
         self.load_text(new_content)
         self.read_only = False
         self.editing = True
         self.disabled = False
-        
-        self.undo_stack = []
-        self.redo_stack = []
-        self.last_saved_state = new_content
-        self.save_current_state()
 
-        self.unsaved_files[filename] = False
+        if first_time_opening:
+            self.last_saved_state = new_content
+
+        if not self.undo_stack:
+            self.save_current_state()
+        
+        if filename not in self.unsaved_files:
+            self.unsaved_files[filename] = False
         
         self.set_language_from_filename(filename)
+
+
+    def _save_file_state(self):
+        if not self.current_file:
+            return
+            
+        self.file_states[self.current_file] = {
+            'undo_stack': self.undo_stack,
+            'redo_stack': self.redo_stack,
+            'last_saved_state': self.last_saved_state
+        }
+
+    def _load_file_state(self):
+        if not self.current_file or self.current_file not in self.file_states:
+            self.undo_stack = []
+            self.redo_stack = []
+            self.last_saved_state = None
+            return
+            
+        state = self.file_states[self.current_file]
+        self.undo_stack = state['undo_stack']
+        self.redo_stack = state['redo_stack']
+        self.last_saved_state = state['last_saved_state']
+
+    @property
+    def undo_stack(self):
+        if not self.current_file or self.current_file not in self.file_states:
+            return []
+        return self.file_states[self.current_file]['undo_stack']
+        
+    @undo_stack.setter
+    def undo_stack(self, value):
+        if not self.current_file:
+            return
+        if self.current_file not in self.file_states:
+            self.file_states[self.current_file] = {'undo_stack': [], 'redo_stack': [], 'last_saved_state': None}
+        self.file_states[self.current_file]['undo_stack'] = value
+        
+    @property
+    def redo_stack(self):
+        if not self.current_file or self.current_file not in self.file_states:
+            return []
+        return self.file_states[self.current_file]['redo_stack']
+        
+    @redo_stack.setter
+    def redo_stack(self, value):
+        if not self.current_file:
+            return
+        if self.current_file not in self.file_states:
+            self.file_states[self.current_file] = {'undo_stack': [], 'redo_stack': [], 'last_saved_state': None}
+        self.file_states[self.current_file]['redo_stack'] = value
+        
+    @property
+    def last_saved_state(self):
+        if not self.current_file or self.current_file not in self.file_states:
+            return None
+        return self.file_states[self.current_file]['last_saved_state']
+        
+    @last_saved_state.setter
+    def last_saved_state(self, value):
+        if not self.current_file:
+            return
+        if self.current_file not in self.file_states:
+            self.file_states[self.current_file] = {'undo_stack': [], 'redo_stack': [], 'last_saved_state': None}
+        self.file_states[self.current_file]['last_saved_state'] = value
+
+
 
     def set_language_from_filename(self, filename):
         if not filename:

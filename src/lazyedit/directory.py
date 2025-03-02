@@ -225,8 +225,23 @@ class Directory(Static):
                     self.render_files()
                 elif os.path.isfile(selected_path):
                     try:
-                        with open(selected_path, "r", encoding="utf-8", errors="ignore") as f:
-                            file_content = f.read()
-                        self.app.file_editor.set_content(file_content, selected_path)
+                        if (hasattr(self.app, 'file_editor') and 
+                            selected_path in self.app.file_editor.file_states and
+                            self.app.file_editor.has_unsaved_changes(selected_path)):
+                            
+                            file_state = self.app.file_editor.file_states[selected_path]
+                            if file_state['undo_stack']:
+                                content = file_state['undo_stack'][-1].text
+                                self.app.file_editor.set_content(content, selected_path)
+                                self.app.notify(f"Loaded file with unsaved changes: {os.path.basename(selected_path)}")
+                            else:
+                                with open(selected_path, "r", encoding="utf-8", errors="ignore") as f:
+                                    file_content = f.read()
+                                self.app.file_editor.set_content(file_content, selected_path)
+                        else:
+                            with open(selected_path, "r", encoding="utf-8", errors="ignore") as f:
+                                file_content = f.read()
+                            self.app.file_editor.set_content(file_content, selected_path)
                     except Exception as e:
                         self.app.notify(f"Error opening file: {str(e)}", severity="error")
+
