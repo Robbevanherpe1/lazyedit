@@ -5,15 +5,20 @@ from rich.style import Style
 from textual.widgets.text_area import TextAreaTheme
 import os
 import pyperclip
+from dataclasses import dataclass
+from typing import List, Optional, Tuple, Union
+
+@dataclass
+class EditOperation:
+    text: str
+    cursor_location: Union[Tuple[int, int], int]
+    selection: Optional[Tuple[Tuple[int, int], Tuple[int, int]]] = None
 
 my_theme = TextAreaTheme(
     name="EditorTheme",
     base_style=Style(bgcolor="#0C0C0C"),
     cursor_style=Style(color="white", bgcolor="blue"),
     cursor_line_style=Style(bgcolor="#2a2a2a"),
-    #gutter_style=Style(color="#90908a", bgcolor="#272822"),
-    #selection_style=Style(bgcolor="#44475a"),
-    #bracket_matching_style=Style(bgcolor="#3a3d41"),
     selection_style=Style(bgcolor="#3b5070"),
     bracket_matching_style=Style(bgcolor="#264f78"),
 
@@ -313,13 +318,16 @@ my_theme = TextAreaTheme(
         "docker.argument": Style(color="#c678dd"),
         "docker.envvar": Style(color="#d19a66"),
     }
-
-
 )
 
 class FileEditor(TextArea):
     current_file: str = ""
     editing: bool = reactive(False)
+    undo_stack: List[EditOperation] = []
+    redo_stack: List[EditOperation] = []
+    is_undoing: bool = False
+    is_redoing: bool = False
+    last_saved_state: Optional[str] = None
 
     BINDINGS = [
         Binding("up", "cursor_up", "Cursor up", show=False),
@@ -393,9 +401,11 @@ class FileEditor(TextArea):
         super().__init__(*args, **kwargs)
         self.show_line_numbers = True
         self.tab_behavior = "indent"
-        
         self.register_theme(my_theme)
         self.theme = "EditorTheme"
+        self.change_timer = None
+        self.idle_timer = None
+        self.MAX_UNDO_STACK = 100
         
         print(f"Available languages: {self.available_languages}")
         print(f"Available themes: {self.available_themes}")
@@ -407,10 +417,14 @@ class FileEditor(TextArea):
         self.editing = True
         self.disabled = False
         
+        self.undo_stack = []
+        self.redo_stack = []
+        self.last_saved_state = new_content
+        self.save_current_state()
+        
         self.set_language_from_filename(filename)
 
     def set_language_from_filename(self, filename):
-        """Set the appropriate language for syntax highlighting based on file extension"""
         if not filename:
             return
             
@@ -435,7 +449,6 @@ class FileEditor(TextArea):
             self.language = None
 
     def debug_highlights(self):
-        """Debug method to print the highlights being generated"""
         if hasattr(self, "_highlights") and self._highlights:
             self.app.notify(f"Found {len(self._highlights)} highlight groups")
             for line_idx, highlights in enumerate(self._highlights):
@@ -450,6 +463,7 @@ class FileEditor(TextArea):
         if self.current_file:
             with open(self.current_file, "w", encoding="utf-8") as f:
                 f.write(self.text)
+            self.last_saved_state = self.text
             self.app.notify(f"Saved: {self.current_file}")
 
     def exit_editing(self):
@@ -486,3 +500,123 @@ class FileEditor(TextArea):
                 traceback.print_exc()
         else:
             self.app.notify("No text selected")
+
+    def get_current_state(self) -> EditOperation:
+        selection = None
+        if self.selection:
+            selection = (self.selection.start, self.selection.end)
+        return EditOperation(
+            text=self.text,
+            cursor_location=self.cursor_location,
+            selection=selection
+        )
+
+    def save_current_state(self) -> None:
+        if self.is_undoing or self.is_redoing:
+            return
+            
+        current_state = self.get_current_state()
+        
+        if self.undo_stack and self.undo_stack[-1].text == current_state.text:
+            return
+            
+        self.undo_stack.append(current_state)
+        if len(self.undo_stack) > self.MAX_UNDO_STACK:
+            self.undo_stack.pop(0)
+        self.redo_stack.clear()
+
+    def apply_state(self, state: EditOperation) -> None:
+        self.load_text(state.text)
+        
+        try:
+            if isinstance(state.cursor_location, tuple):
+                row, col = state.cursor_location
+                row, col = int(row), int(col)
+                
+                self.cursor_location = (row, col)
+            else:
+                document = self.document
+                row = 0
+                col = 0
+                remaining = int(state.cursor_location)
+                
+                for line in document:
+                    line_len = len(line) + 1 
+                    if remaining < line_len:
+                        col = remaining
+                        break
+                    remaining -= line_len
+                    row += 1
+                    
+                self.cursor_location = (row, col)
+            
+            if state.selection:
+                start, end = state.selection
+                if isinstance(start, tuple) and isinstance(end, tuple):
+                    from textual.widgets._text_area import Selection
+                    self.selection = Selection(start, end)
+        except Exception as e:
+            print(f"Error in apply_state: {e}")
+            import traceback
+            traceback.print_exc()
+            self.cursor_location = (0, 0)
+
+
+
+    def action_undo(self) -> None:
+        if len(self.undo_stack) <= 1:
+            self.app.notify("Nothing to undo")
+            return
+            
+        self.is_undoing = True
+        try:
+            current_state = self.get_current_state()
+            self.redo_stack.append(current_state)
+            
+            self.undo_stack.pop()
+            previous_state = self.undo_stack[-1]
+            
+            self.apply_state(previous_state)
+            self.app.notify("Undo successful")
+        finally:
+            self.is_undoing = False
+
+    def action_redo(self) -> None:
+        if not self.redo_stack:
+            self.app.notify("Nothing to redo")
+            return
+            
+        self.is_redoing = True
+        try:
+            next_state = self.redo_stack.pop()
+            current_state = self.get_current_state()
+            self.undo_stack.append(current_state)
+            
+            self.apply_state(next_state)
+            self.app.notify("Redo successful")
+        finally:
+            self.is_redoing = False
+
+    def on_text_area_changed(self, event) -> None:
+        if self.is_undoing or self.is_redoing:
+            return
+            
+        if self.idle_timer:
+            self.idle_timer.stop()
+            
+        self.idle_timer = self.set_timer(0.5, self.save_current_state)
+
+    def on_key(self, event) -> None:
+        key_combo = event.key
+        
+        logical_edit_keys = [
+            "enter", "tab", "ctrl+v", "ctrl+x", "delete", "backspace", 
+            "ctrl+k", "ctrl+u", "ctrl+w", "ctrl+d", "ctrl+f"
+        ]
+        
+        if key_combo == "space" or key_combo in ".,;:!?()[]{}<>\"'+-*/=":
+            self.save_current_state()
+        
+        elif key_combo in logical_edit_keys:
+            self.save_current_state()
+    
