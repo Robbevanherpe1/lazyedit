@@ -26,6 +26,15 @@ class LazyDockerScreen(Screen):
 
     def run_lazydocker(self):
         try:
+            try:
+                subprocess.run(["docker", "context", "use", "default"], 
+                                check=True, 
+                                text=True, 
+                                capture_output=True)
+                self.app.notify("Docker context set to default", severity="information")
+            except subprocess.CalledProcessError as e:
+                self.app.notify(f"Failed to set Docker context: {e.stderr}", severity="warning")
+
             self.process = subprocess.Popen(["lazydocker"], text=True)
             threading.Thread(target=self.monitor_lazydocker, daemon=True).start()
         except FileNotFoundError:
